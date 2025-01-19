@@ -1,18 +1,42 @@
-from django.shortcuts import render, redirect
+
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Student
 from .forms import StudentForm
+from django.db.utils import IntegrityError
+from django.contrib import messages
 
-def student_list(request):
-    students = Student.objects.all().order_by('-date_registered')
-    return render(request, 'registration/student_list.html', {'students': students})
+class StudentListView(ListView):
+    model = Student
+    template_name = 'app/student_list.html'
+    context_object_name = 'students'
 
-def student_register(request):
-    if request.method == 'POST':
-        form = StudentForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('student_list')
-    else:
-        form = StudentForm()
-    return render(request, 'registration/student_register.html', {'form': form})
+class StudentDetailView(DetailView):
+    model = Student
+    template_name = 'app/student_detail.html'
+    context_object_name = 'student'
+
+class StudentCreateView(CreateView):
+    model = Student
+    form_class = StudentForm
+    template_name = 'app/student_form.html'
+    success_url = reverse_lazy('student-list')
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            form.add_error('email', 'This email address is already registered.')
+            return self.form_invalid(form)
+
+class StudentUpdateView(UpdateView):
+    model = Student
+    form_class = StudentForm
+    template_name = 'app/student_form.html'
+    success_url = reverse_lazy('student-list')
+
+class StudentDeleteView(DeleteView):
+    model = Student
+    template_name = 'app/student_confirm_delete.html'
+    success_url = reverse_lazy('student-list')
 
