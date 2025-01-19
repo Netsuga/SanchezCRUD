@@ -14,6 +14,16 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        {% endfor %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
         <button type="submit">Save</button>
     </form>
     <a href="{% url 'student-list' %}">Back to List</a>
