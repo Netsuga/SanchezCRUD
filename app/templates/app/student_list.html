@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student List</title>
+    <link rel="stylesheet" href="{% static '/css/base.css' %}">
+</head>
+<body>
+    <h1>Registered Students</h1>
+    <a href="{% url 'student-create' %}">Register New Student</a>
+    <ul>
+        {% for student in students %}
+            <li>
+                <a href="{% url 'student-detail' student.pk %}">{{ student.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
